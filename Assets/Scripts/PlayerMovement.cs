@@ -4,38 +4,56 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(Animator))]
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private GroundTracking groundTracking;
     [SerializeField] private float _speed;
     [SerializeField] private float _jumpForce;
+
     private Rigidbody2D _rigidbody2D;
     private SpriteRenderer _sprite;
+    private Animator _animator;
+    private Coroutine _stateTracking;
+
     public State CurrentState { get; private set; }
 
     public enum State
     {
-        Idle,
-        Run,
-        JumpUp,
-        JumpDown
+        Idle = 0,
+        Run = 1,
+        JumpUp = 2,
+        JumpDown = 3
     }
 
     private void OnEnable()
     {
-        groundTracking.Changed += StateChange;
+      //  groundTracking.GroundFound += GroundFound;
+        groundTracking.GroundLost += GroundLost;
     }
 
     private void OnDisable()
     {
-        groundTracking.Changed -= StateChange;
+      //  groundTracking.GroundFound -= GroundFound;
+        groundTracking.GroundLost -= GroundLost;
+    }
+
+    private void GroundFound()
+    {
+        Debug.Log("GroundFound");
+    }
+    private void GroundLost()
+    {
+        StateTracking(true);
+        Debug.Log("GroundLost");
     }
 
     private void Start()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _sprite = GetComponent<SpriteRenderer>();
-        CurrentState = State.Idle;
+        _animator = GetComponent<Animator>();
+        CurrentState = State.Idle;        
     }
 
     private void Update()
@@ -63,12 +81,7 @@ public class PlayerMovement : MonoBehaviour
             _rigidbody2D.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
         }
     }
-
-    private void Idle()
-    {
-
-    }
-
+    
     private void Run(bool flipX)
     {
         int direction = flipX ? -1 : 1;
@@ -76,6 +89,7 @@ public class PlayerMovement : MonoBehaviour
             _sprite.flipX = flipX;
 
         transform.Translate(_speed * Time.deltaTime * direction, 0, 0);
+        StateTracking(true);
     }
 
     private void StateChange(State state)
@@ -83,9 +97,11 @@ public class PlayerMovement : MonoBehaviour
         if (CurrentState != state)
         {
             CurrentState = state;
+            _animator.SetInteger("State", (int)state);
             switch (CurrentState)
             {
                 case State.Idle:
+                    StateTracking(false);
                     Debug.Log("Idle");
                     break;
                 case State.Run:
@@ -98,6 +114,59 @@ public class PlayerMovement : MonoBehaviour
                     Debug.Log("Down");
                     break;
             }
+        }
+    }
+
+    private void StateTracking(bool activate)
+    {
+        if (activate)
+        {
+            if (_stateTracking == null)
+                _stateTracking = StartCoroutine(StateTracking());
+        }
+        else
+        {
+            if (_stateTracking != null)
+            {
+                StopCoroutine(_stateTracking);
+                _stateTracking = null;
+            }
+        }
+    }
+
+    private IEnumerator StateTracking()
+    {
+        Vector3 pastPosition = transform.position;
+        while (true)
+        {
+            if (groundTracking.IsGround)
+            {
+                if (pastPosition.x != transform.position.x)
+                {
+                    pastPosition.x = transform.position.x;
+                    StateChange(State.Run);
+                }
+                else
+                {
+                    StateChange(State.Idle);
+                }
+            }
+            else
+            {
+                if (pastPosition.y - transform.position.y < -0.1)
+                {
+                    StateChange(State.JumpUp);
+                    // pastPosition.y = transform.position.y;
+                    pastPosition = transform.position;
+                }
+                else if (pastPosition.y - transform.position.y > 0.1)
+                {
+                    StateChange(State.JumpDown);
+                    // pastPosition.y = transform.position.y;
+                    pastPosition = transform.position;
+                }
+            }
+            yield return null;
         }
     }
 }
