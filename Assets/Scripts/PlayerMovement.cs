@@ -7,7 +7,9 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private GroundTracking groundTracking;
+    [SerializeField] private GroundTracking _underfoot;
+    [SerializeField] private GroundTracking _onLeft;
+    [SerializeField] private GroundTracking _onRight;
     [SerializeField] private float _speed;
     [SerializeField] private float _jumpForce;
 
@@ -29,13 +31,13 @@ public class PlayerMovement : MonoBehaviour
     private void OnEnable()
     {
       //  groundTracking.GroundFound += GroundFound;
-        groundTracking.GroundLost += GroundLost;
+        _underfoot.GroundLost += GroundLost;
     }
 
     private void OnDisable()
     {
       //  groundTracking.GroundFound -= GroundFound;
-        groundTracking.GroundLost -= GroundLost;
+        _underfoot.GroundLost -= GroundLost;
     }
 
     private void GroundFound()
@@ -78,18 +80,30 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            _rigidbody2D.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
+            if (_underfoot.IsGround)
+                _rigidbody2D.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
         }
     }
     
     private void Run(bool flipX)
     {
         int direction = flipX ? -1 : 1;
+        StateTracking(true);
         if (_sprite.flipX != flipX)
             _sprite.flipX = flipX;
 
+        if (flipX)
+        {
+            if (_onLeft.IsGround)
+                return;
+        }
+        else
+        {
+            if (_onRight.IsGround)
+                return;
+        }
+
         transform.Translate(_speed * Time.deltaTime * direction, 0, 0);
-        StateTracking(true);
     }
 
     private void StateChange(State state)
@@ -139,7 +153,7 @@ public class PlayerMovement : MonoBehaviour
         Vector3 pastPosition = transform.position;
         while (true)
         {
-            if (groundTracking.IsGround)
+            if (_underfoot.IsGround)
             {
                 if (pastPosition.x != transform.position.x)
                 {
@@ -156,13 +170,11 @@ public class PlayerMovement : MonoBehaviour
                 if (pastPosition.y - transform.position.y < -0.1)
                 {
                     StateChange(State.JumpUp);
-                    // pastPosition.y = transform.position.y;
                     pastPosition = transform.position;
                 }
                 else if (pastPosition.y - transform.position.y > 0.1)
                 {
                     StateChange(State.JumpDown);
-                    // pastPosition.y = transform.position.y;
                     pastPosition = transform.position;
                 }
             }
