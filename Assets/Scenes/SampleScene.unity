@@ -447,7 +447,7 @@ GameObject:
   - component: {fileID: 58096693}
   - component: {fileID: 58096692}
   m_Layer: 0
-  m_Name: SpownCoin
+  m_Name: SpawnCoin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7598,6 +7598,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1655937926}
   - component: {fileID: 1655937925}
+  - component: {fileID: 1655937929}
   - component: {fileID: 1655937924}
   - component: {fileID: 1655937923}
   - component: {fileID: 1655937927}
@@ -7702,6 +7703,7 @@ MonoBehaviour:
   _onRight: {fileID: 1418039247}
   _speed: 2
   _jumpForce: 7
+  _currentState: 0
 --- !u!4 &1655937926
 Transform:
   m_ObjectHideFlags: 0
@@ -7757,6 +7759,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &1655937929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1655937922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8caf8e96d986a0f4984e95e19c52ee83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1674506654
 GameObject:
   m_ObjectHideFlags: 0

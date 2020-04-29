@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpownCoinsSystem : MonoBehaviour
+public class SpawnCoinsSystem : MonoBehaviour
 {    
     private List<Point> _availableSpawnPoints;
 
@@ -12,11 +12,11 @@ public class SpownCoinsSystem : MonoBehaviour
     private void Start()
     {
         _availableSpawnPoints = new List<Point>();
-        Point[] _allSpownPoint = GetComponentsInChildren<Point>();
+        Point[] _allSpawnPoint = GetComponentsInChildren<Point>();
 
-        for (int i = 0; i < _allSpownPoint.Length; i++)
+        for (int i = 0; i < _allSpawnPoint.Length; i++)
         {
-            _availableSpawnPoints.Add(_allSpownPoint[i]);
+            _availableSpawnPoints.Add(_allSpawnPoint[i]);
         }
 
         StartCoroutine(CreateCoinInRandomPoint());

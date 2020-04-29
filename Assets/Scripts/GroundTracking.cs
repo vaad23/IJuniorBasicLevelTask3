@@ -6,8 +6,9 @@ using UnityEngine.Events;
 public class GroundTracking : MonoBehaviour
 {
     private int _countGround;
-    private bool _isGround;
+    // private bool _isGround;
 
+    public bool IsGround { get; private set; }
     public int CountGround
     {
         get
@@ -31,7 +32,7 @@ public class GroundTracking : MonoBehaviour
         }
     }
 
-    public bool IsGround
+  /*  public bool IsGround
     {
         get
         {
@@ -41,19 +42,18 @@ public class GroundTracking : MonoBehaviour
         {
             _isGround = value;
             if (_isGround)
-                GroundFound?.Invoke();
+                GroundFound?.Invoke(true);
             else
-                GroundLost?.Invoke();
+                GroundFound?.Invoke(false);
         }
     }
 
-    public event UnityAction GroundFound;
-    public event UnityAction GroundLost;
+    public event UnityAction<bool> GroundFound;
 
-
+*/
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.TryGetComponent<Ground>(out Ground ground))
+        if (collision.TryGetComponent(out Ground ground))
         {
             CountGround++;
         }
@@ -61,7 +61,7 @@ public class GroundTracking : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.TryGetComponent<Ground>(out Ground ground))
+        if (collision.TryGetComponent(out Ground ground))
         {
             CountGround--;
         }
